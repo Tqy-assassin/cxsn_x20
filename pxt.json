@@ -10,7 +10,8 @@
         "main.blocks",
         "main.ts",
         "README.md",
-        "main.py"
+        "main.py",
+        "cxsn_normal.ts"
     ],
     "testFiles": [
         "test.ts"
