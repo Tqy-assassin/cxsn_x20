@@ -7,7 +7,8 @@
     },
     "files": [
         "README.md",
-        "cxsn_normal.ts"
+        "cxsn_normal.ts",
+        "_locales/zh/cxsn_normal-strings.json"
     ],
     "public": true,
     "targetVersions": {

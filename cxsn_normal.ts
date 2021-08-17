@@ -1,47 +1,58 @@
 enum MotorPortNo {
-    //% block="端口1"
+    //% block="port1"
     port1 = 0,
-    //% block="端口2"
+    //% block="port2"
     port2 = 1,
-    //% block="端口3"
+    //% block="port3"
     port3 = 2,
-    //% block="端口4"
+    //% block="port4"
     port4 = 3,
-    //% block="端口5"
+    //% block="port5"
     port5 = 4,
-    //% block="端口6"
+    //% block="port6"
     port6 = 5
 }
 
 enum MotorNo {
-    //% block="电机一"
+    //% block="motor_1"
     motor_1 = 0,
-    //% block="电机二"
+    //% block="motor_2"
     motor_2 = 1,
 }
 
 enum MotorDir {
-    //% block="顺时针"
+    //% block="clockwise"
     clockwise = 0,
-    //% block="逆时针"
+    //% block="counterclockwise"
     counterclockwise = 1,
 }
 
-//% block="晨旭少年传感器" color="#FA0010" weight=20 icon="\uf11b"
+//% block="cxsn_normal" color="#FA0010" weight=20 icon="\uf11b"
 namespace CXSN_motor {
+    export class cxsn_port {
+        /**
+         * Use "$this" to define a variable block that
+         * references the "this" pointer.
+         */
+        //% block="robot $this(robot) say $message"
+        public say(message: string) {
+            
+        }
+    }
+
     //% block = "Hello"
     export function helloWorld() {
         basic.showString("Hello World!")
     }
 
-    //% block="初始化电机 端口 $x"
+    //% block="Init the motor as $x"
     //% x.defl=MotorPortNo.port1
     export function motor_Init(x: MotorPortNo) {
         serial.redirect(SerialPin.P0, SerialPin.P1, 9600)
         // basic.showNumber(x)
     }
 
-    //% block="设置 $no $dir 旋转  速度 $speed"
+    //% block="set the $no $dir rotation, speed is $speed"
     //% speed.max=100 speed.min=0 speed.defl=100
     export function set_motor(no: MotorNo, dir: MotorDir, speed: number) {
         if (no == MotorNo.motor_1) {
