@@ -1,4 +1,3 @@
-// 在此处添加您的代码
 enum MotorPortNo {
     //% block="端口1"
     port1 = 0,
