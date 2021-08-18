@@ -1,6 +1,6 @@
 {
     "name": "cxsn_x20",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "description": "",
     "dependencies": {
         "core": "*"
