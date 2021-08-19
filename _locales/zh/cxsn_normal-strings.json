@@ -1,3 +1,19 @@
 {
-    
+    "PortNo.port1|block": "端口1",
+    "PortNo.port2|block": "端口2",
+    "PortNo.port3|block": "端口3",
+    "PortNo.port4|block": "端口4",
+    "PortNo.port5|block": "端口5",
+    "PortNo.port6|block": "端口6",
+    "MotorNo.motor_1|block": "1号电机",
+    "MotorNo.motor_2|block": "2号电机",
+    "Serial_mode._unused|block": "未使用",
+    "Serial_mode._read|block": "只写",
+    "Serial_mode._write|block": "只读",
+    "Serial_mode._readwrite|block": "读写",
+    "CXSN_normal|block":"晨旭少年基础模块",
+    "motor_Init|block":"初始化端口$x为电机",
+    "set_motor|block":"设置$x $no $dir旋转,速度为$speed",
+    "{id:category}CXSN_normal": "晨旭少年基础模块",
+    "{id:group}motor": "电机模块"
 }
