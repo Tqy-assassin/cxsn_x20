@@ -69,7 +69,6 @@ namespace CXSN_normal {
     //% tx_p.min=0 tx_p.max=2 tx_p.defl=0
     //% rx_p.min=0 rx_p.max=2 rx_p.defl=2
     //% group="serial"
-    //% inlineInputMode=inline
     export function InitSerial_Ex(x: PortNo, mode: Serial_mode, tx_p:number, rx_p:number) {
         cx_serial[x].init(pin_id[x][tx_p], pin_id[x][rx_p], 9600, mode);
         cx_serial[x].begin()
@@ -91,6 +90,12 @@ namespace CXSN_normal {
     //% group="serial"
     export function Serial_Read(x: PortNo):string {
         return cx_serial[x].read();
+    }
+
+    //% block="port %x serial read available"
+    //% group="serial"
+    export function Serial_Available(x: PortNo):boolean {
+        return cx_serial[x].available();
     }
 
     //% block="set port %x LED %state"
