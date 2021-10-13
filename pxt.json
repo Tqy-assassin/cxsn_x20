@@ -8,8 +8,8 @@
     "files": [
         "README.md",
         "cxsn_normal.ts",
-        "_locales/zh/cxsn_normal-strings.json",
-        "test.ts",
+        "_locales/zh/cxsn_x20-strings.json",
+        "_locales/zh/cxsn_x20-jsdoc-strings.json",
         "cxsn_serial.ts"
     ],
     "testFiles": [
