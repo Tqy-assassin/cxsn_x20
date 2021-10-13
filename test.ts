@@ -1,10 +1,9 @@
-// CXSN_normal.motor_Init(PortNo.port1)
+let pin = PortNo.port2
+CXSN_normal.InitSerial(pin, Serial_mode._readwrite)
 
 basic.forever(function() {
-    // CXSN_normal.Set_LED(PortNo.port2, false)
-    // CXSN_normal.set_motor(PortNo.port1, MotorNo.motor_1, MotorDir.clockwise, 100)
-    // basic.pause(500)
-    // CXSN_normal.set_motor(PortNo.port1, MotorNo.motor_1, MotorDir.clockwise, 0)
-    // basic.pause(500)
+    if (CXSN_normal.Serial_Available(pin)){
+        CXSN_normal.Serial_Write_String(pin, CXSN_normal.Serial_Read(pin));
+    }
 
 })

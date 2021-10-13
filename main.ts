@@ -43,9 +43,6 @@ enum Serial_mode {
 //% groups="['normal', 'motor', 'serial']"
 //% group 
 namespace CXSN_normal {
-    let cx_serial: cxsn_serial[] = [new cxsn_serial(), new cxsn_serial(), new cxsn_serial(),
-                                    new cxsn_serial(), new cxsn_serial(), new cxsn_serial()];
-
     const pin_id = [
         [DigitalPin.P0, DigitalPin.P3, DigitalPin.P4],
         [DigitalPin.P1, DigitalPin.P5, DigitalPin.P6],
@@ -92,8 +89,11 @@ namespace CXSN_normal {
     //% block="set port %x as serial with %mode mode"
     //% group="serial"
     export function InitSerial(x: PortNo, mode: Serial_mode) {
+        if (cx_serial[x] == null){
+            cx_serial[x] = new cxsn_serial();
+        }
         cx_serial[x].init(pin_id[x][0], pin_id[x][2], 9600, mode);
-        cx_serial[x].begin()
+        cx_serial[x].begin();
     }
 
     //% blockId=InitSerial_Ex

@@ -7,7 +7,8 @@ class cxsn_serial {
     _delay: number = 0;
     _recvDate: Array<number>;
 
-    constructor() { }
+    constructor() {
+    }
 
     public init(tx: DigitalPin, rx: DigitalPin, baud: number, mode: Serial_mode) {
         this._rx_pin = tx;
@@ -86,3 +87,6 @@ class cxsn_serial {
         return this._recvDate.length > 0;
     }
 }
+
+
+let cx_serial: cxsn_serial[] = [new cxsn_serial(), new cxsn_serial(), new cxsn_serial(), new cxsn_serial(), new cxsn_serial(), new cxsn_serial()];
