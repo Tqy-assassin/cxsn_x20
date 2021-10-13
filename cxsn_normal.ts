@@ -122,4 +122,3 @@ namespace CXSN_normal {
         }
     }
 }
-
