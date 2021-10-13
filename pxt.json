@@ -9,7 +9,8 @@
         "README.md",
         "cxsn_normal.ts",
         "_locales/zh/cxsn_normal-strings.json",
-        "test.ts"
+        "test.ts",
+        "cxsn_serial.ts"
     ],
     "testFiles": [
         "test.ts"
@@ -22,5 +23,16 @@
     "supportedTargets": [
         "microbit"
     ],
-    "preferredEditor": "tsprj"
+    "preferredEditor": "tsprj",
+    "yotta": {
+        "config": {
+            "microbit-dal": {
+                "bluetooth": {
+                    "open": 0,
+                    "whitelist": 1,
+                    "security_level": "SECURITY_MODE_ENCRYPTION_NO_MITM"
+                }
+            }
+        }
+    }
 }

@@ -28,107 +28,20 @@ enum MotorDir {
 }
 
 enum Serial_mode {
+    //% block="readwrite"
+    _readwrite = 3,
     //% block="unused"
     _unused = 0,
     //% block="readonly"
     _read = 1,
     //% block="writeonly"
     _write = 2,
-    //% block="readwrite"
-    _readwrite = 3
 }
 
-class cxsn_serial {
-    _mode: Serial_mode = Serial_mode._unused;
-    _rx_pin: DigitalPin;
-    _tx_pin: DigitalPin;
-    _delay: number = 0;
-    _recvDate: string = "";
-    _readable: boolean = false;
-
-    constructor() { }
-
-    public init(tx: DigitalPin, rx: DigitalPin, baud: number, mode: Serial_mode) {
-        this._rx_pin = tx;
-        this._tx_pin = rx;
-        this._mode = mode;
-        this._delay = 1000000 / baud;
-        this._readable = false;
-    }
-
-    public reInit(tx: DigitalPin, rx: DigitalPin, baud: number, mode: Serial_mode) {
-        this._rx_pin = tx;
-        this._tx_pin = rx;
-        this._mode = mode;
-        this._delay = 1000000 / baud;
-        this._readable = false;
-    }
-
-    public begin() {
-        if ((this._mode | Serial_mode._read) != 0) {
-            control.inBackground(() => this.reading())
-        }
-    }
-
-    private reading() {
-        if ((this._mode | Serial_mode._read) != 0) {
-            if (pins.digitalReadPin(this._rx_pin)) {
-                let recvBuf: number = 0;
-                control.waitMicros(this._delay);
-                for (let i = 0; i < 8; i++) {
-                    if (pins.digitalReadPin(this._rx_pin)) {
-                        recvBuf |= (1 << i)
-                    } else {
-                        recvBuf &= ~(1 << i)
-                    }
-                    control.waitMicros(this._delay);
-                }
-                this._recvDate = String.fromCharCode(recvBuf);
-                this._readable = true;
-            }
-        }
-    }
-
-    private writing(transDate: number) {
-        if ((this._mode | Serial_mode._write) != 0) {
-            pins.digitalWritePin(this._tx_pin, 0);
-            control.waitMicros(this._delay);
-            for (let i = 0; i < 8; i++) {
-                if ((transDate & 0x01) == 0) {
-                    pins.digitalWritePin(this._tx_pin, 0);
-                } else {
-                    pins.digitalWritePin(this._tx_pin, 1);
-                }
-                control.waitMicros(this._delay);
-                transDate >>= 1;
-            }
-            pins.digitalWritePin(this._tx_pin, 1);
-        }
-    }
-
-    public write_string(msg: string) {
-        for (let i = 0; i < msg.length; i++) {
-            this.writing(msg[i].charCodeAt(0))
-        }
-    }
-    public write_numbers(nums: number[]) {
-        for (let i = 0; i < nums.length; i++) {
-            this.writing(nums[i])
-        }
-    }
-    public read(): string {
-        let res = this._recvDate;
-        this._recvDate = ""
-        this._readable = false
-        return res;
-    }
-    public aviable(): boolean {
-        return this._readable;
-    }
-}
 
 //% block="cxsn_normal" color="#F02010" weight=100 icon="\uf11b"
-//% groups="['motor']"
+//% groups="['normal', 'motor', 'serial']"
+//% group 
 namespace CXSN_normal {
     let cx_serial: cxsn_serial[] = [new cxsn_serial(), new cxsn_serial(), new cxsn_serial(),
                                     new cxsn_serial(), new cxsn_serial(), new cxsn_serial()];
@@ -139,23 +52,65 @@ namespace CXSN_normal {
     const pin_id = [
         [DigitalPin.P0, DigitalPin.P3, DigitalPin.P4],
         [DigitalPin.P1, DigitalPin.P5, DigitalPin.P6],
-        [DigitalPin.P2, DigitalPin.P7, DigitalPin.P8],
+        [DigitalPin.P2, DigitalPin.P8, DigitalPin.P7],
         [DigitalPin.P9, DigitalPin.P10, DigitalPin.P11],
         [DigitalPin.P13, DigitalPin.P14, DigitalPin.P15],
         [DigitalPin.P16, DigitalPin.P19, DigitalPin.P20]];
     
-    // export function NewSerial(tx: DigitalPin, rx: DigitalPin, baud: number, mode: Serial_mode): cxsn_serial {
-    //     return new cxsn_serial(tx, rx, baud, mode);
-    // }
-    
 
-    //% block="Init the motor as $x"
+    //% block="set port %x as serial with %mode mode"
+    //% group="serial"
+    export function InitSerial(x: PortNo, mode: Serial_mode) {
+        cx_serial[x].init(pin_id[x][0], pin_id[x][2], 9600, mode);
+        cx_serial[x].begin()
+    }
+
+    //% block="set port %x as serial | mode:%mode | tx pin:%tx_p | rx pin:%rx_p"
+    //% tx_p.min=0 tx_p.max=2 tx_p.defl=0
+    //% rx_p.min=0 rx_p.max=2 rx_p.defl=2
+    //% group="serial"
+    //% inlineInputMode=inline
+    export function InitSerial_Ex(x: PortNo, mode: Serial_mode, tx_p:number, rx_p:number) {
+        cx_serial[x].init(pin_id[x][tx_p], pin_id[x][rx_p], 9600, mode);
+        cx_serial[x].begin()
+    }
+    
+    //% block="port %x serial write %str"
+    //% group="serial"
+    export function Serial_Write_String(x: PortNo, str: string) {
+        cx_serial[x].write_string(str);
+    }
+
+    //% block="port %x serial write %arr"
+    //% group="serial"
+    export function Serial_Write_Number(x: PortNo, arr: number[]) {
+        cx_serial[x].write_numbers(arr);
+    }
+
+    //% block="port %x serial read"
+    //% group="serial"
+    export function Serial_Read(x: PortNo):string {
+        return cx_serial[x].read();
+    }
+
+    //% block="set port %x LED %state"
+    //% state.shadow=toggleOnOff
+    //% group="normal"
+    export function Set_LED(x: PortNo, state: boolean) {
+        if(state)
+            pins.digitalWritePin(pin_id[x][0], 0)
+        else
+            pins.digitalWritePin(pin_id[x][0], 1)
+    }
+
+    //% block="Init the motor as %x"
     //% group="motor"
     export function motor_Init(x: PortNo) {
         cx_serial[x].init(pin_id[x][0], pin_id[x][2], 9600, Serial_mode._write);
+        cx_serial[x].begin();
     }
 
-    //% block="set $x the $no $dir rotation, speed is $speed"
+    //% block="set %x the %no %dir rotation, speed is %speed"
     //% inlineInputMode = inline
     //% speed.max=100 speed.min=0 speed.defl=100
     //% group="motor"

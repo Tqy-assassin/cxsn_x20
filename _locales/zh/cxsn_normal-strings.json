@@ -12,8 +12,9 @@
     "Serial_mode._write|block": "只读",
     "Serial_mode._readwrite|block": "读写",
     "CXSN_normal|block":"晨旭少年基础模块",
-    "motor_Init|block":"初始化端口$x为电机",
-    "set_motor|block":"设置$x $no $dir旋转,速度为$speed",
+    "motor_Init|block":"初始化端口%x为电机",
+    "set_motor|block":"设置%x %no %dir旋转,速度为%speed",
     "{id:category}CXSN_normal": "晨旭少年基础模块",
-    "{id:group}motor": "电机模块"
+    "{id:group}motor": "电机模块",
+    "{id:group}normal": "常用传感器"
 }
