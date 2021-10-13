@@ -10,7 +10,7 @@
         "_locales/zh/cxsn_x20-strings.json",
         "_locales/zh/cxsn_x20-jsdoc-strings.json",
         "cxsn_serial.ts",
-        "main.ts"
+        "cxsn_normal.ts"
     ],
     "testFiles": [
         "test.ts"

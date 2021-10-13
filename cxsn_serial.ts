@@ -5,8 +5,8 @@ class cxsn_serial {
     _rx_pin: DigitalPin;
     _tx_pin: DigitalPin;
     _delay: number = 0;
-    _recvDate: Array<number>;
-
+    _recvDate: Array<number> = [];
+    
     constructor() {
     }
 
@@ -88,5 +88,3 @@ class cxsn_serial {
     }
 }
 
-
-let cx_serial: cxsn_serial[] = [new cxsn_serial(), new cxsn_serial(), new cxsn_serial(), new cxsn_serial(), new cxsn_serial(), new cxsn_serial()];
