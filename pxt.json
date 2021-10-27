@@ -3,7 +3,8 @@
     "version": "0.2.0",
     "description": "",
     "dependencies": {
-        "core": "*"
+        "core": "*",
+        "servo": "*"
     },
     "files": [
         "README.md",
@@ -17,7 +18,7 @@
     ],
     "public": true,
     "targetVersions": {
-        "target": "4.0.11",
+        "target": "4.0.16",
         "targetId": "microbit"
     },
     "supportedTargets": [
@@ -30,7 +31,8 @@
                 "bluetooth": {
                     "open": 0,
                     "whitelist": 1,
-                    "security_level": "SECURITY_MODE_ENCRYPTION_NO_MITM"
+                    "security_level": "SECURITY_MODE_ENCRYPTION_NO_MITM",
+                    "event_service": 0
                 }
             }
         }
