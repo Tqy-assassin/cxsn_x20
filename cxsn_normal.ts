@@ -13,15 +13,6 @@ enum PortNo {
     port6 = 5
 }
 
-enum AnalogInputPortNo {
-    //% block="port1"
-    port1 = 0,
-    //% block="port2"
-    port2 = 1,
-    //% block="port3"
-    port3 = 2
-}
-
 enum MotorNo {
     //% block="motor_1"
     motor_1 = 0,
@@ -47,9 +38,17 @@ enum Serial_mode {
     _unused = 0,
 }
 
+enum Servo_port {
+    //% block="port1"
+    port1 = 0,
+    //% block="port2"
+    port2 = 1,
+    //% block="port3"
+    port3 = 2,
+}
 
 //% block="cxsn_normal" color="#F02010" weight=100 icon="\uf11b"
-//% groups="['normal', 'motor', 'serial']"
+//% groups="['normal', 'motor', 'serial', 'servo']"
 //% group 
 namespace CXSN_normal {
     const pin_id = [
@@ -96,14 +95,14 @@ namespace CXSN_normal {
     //% blockId=RP_Read_Number
     //% block="the number of %x RP"
     //% group="normal"
-    export function RP_Read_Number(x: AnalogInputPortNo): number {
+    export function RP_Read_Number(x: PortNo): number {
         return pins.analogReadPin(analog_pin[x][0])
     }
 
     //% blockId=RP_Read_Voltage
     //% block="the voltage of %x"
     //% group="normal"
-    export function RP_Read_Voltage(x: AnalogInputPortNo): number {
+    export function RP_Read_Voltage(x: PortNo): number {
         return pins.analogReadPin(analog_pin[x][0]) * 5 / 1023
     }
 
@@ -127,52 +126,169 @@ namespace CXSN_normal {
         }
     }
 
-    // //% blockId=InitSerial
-    // //% block="set port %x as serial with %mode mode"
-    // //% group="serial"
-    // export function InitSerial(x: PortNo, mode: Serial_mode) {
-    //     if (cx_serial[x] == null) {
-    //         cx_serial[x] = new cxsn_serial();
-    //     }
-    //     cx_serial[x].init(pin_id[x][0], pin_id[x][2], 9600, mode);
-    //     cx_serial[x].begin();
-    // }
 
-    // //% blockId=InitSerial_Ex
-    // //% block="set port %x as serial | mode:%mode | tx pin:%tx_p | rx pin:%rx_p"
-    // //% tx_p.min=0 tx_p.max=2 tx_p.defl=0
-    // //% rx_p.min=0 rx_p.max=2 rx_p.defl=2
-    // //% group="serial"
-    // export function InitSerial_Ex(x: PortNo, mode: Serial_mode, tx_p: number, rx_p: number) {
-    //     cx_serial[x].init(pin_id[x][tx_p], pin_id[x][rx_p], 9600, mode);
-    //     cx_serial[x].begin()
-    // }
+    /**
+     * Set the servo angle
+     */
+    //% weight=100 help=servos/set-angle
+    //% blockId=Servos_SetAngle block="set %servo angle to %degrees=protractorPicker °"
+    //% degrees.defl=90
+    //% servo.fieldEditor="gridpicker"
+    //% servo.fieldOptions.width=220
+    //% servo.fieldOptions.columns=2
+    //% group="servo"
+    export function Servos_SetAngle(servo: Servo_port, degrees: number){
+        switch(servo){
+            case 0:
+                servos.P0.setAngle(degrees)
+                break;
+            case 1:
+                servos.P1.setAngle(degrees)
+                break;
+            case 2:
+                servos.P2.setAngle(degrees)
+                break;
+            default:
+                break;
+        }
+    }
 
-    // //% blockId=Serial_Write_String
-    // //% block="port %x serial write %str"
-    // //% group="serial"
-    // export function Serial_Write_String(x: PortNo, str: string) {
-    //     cx_serial[x].write_string(str);
-    // }
+    
+    /**
+     * Set the throttle on a continuous servo
+     * @param speed the throttle of the motor from -100% to 100%
+     */
+    //% weight=99 help=servos/run
+    //% blockId=Servos_Run block="continuous %servo run at %speed=speedPicker \\%"
+    //% servo.fieldEditor="gridpicker"
+    //% servo.fieldOptions.width=220
+    //% servo.fieldOptions.columns=2
+    //% group="servo"
+    export function Servos_Run(servo: Servo_port, speed: number) {
+        switch (servo) {
+            case 0:
+                servos.P0.run(speed)
+                break;
+            case 1:
+                servos.P1.run(speed)
+                break;
+            case 2:
+                servos.P2.run(speed)
+                break;
+            default:
+                break;
+        }
+    }
 
-    // //% blockId=Serial_Write_Number
-    // //% block="port %x serial write %arr"
-    // //% group="serial"
-    // export function Serial_Write_Number(x: PortNo, arr: number[]) {
-    //     cx_serial[x].write_numbers(arr);
-    // }
 
-    // //% blockId=Serial_Read
-    // //% block="port %x serial read"
-    // //% group="serial"
-    // export function Serial_Read(x: PortNo): string {
-    //     return cx_serial[x].read();
-    // }
+    /**
+     * Set the pulse width to the servo in microseconds
+     * @param micros the width of the pulse in microseconds
+     */
+    //% weight=10 help=servos/set-pulse
+    //% blockId=Servos_SetPulse block="set %servo pulse to %micros μs"
+    //% micros.min=500 micros.max=2500
+    //% micros.defl=1500
+    //% servo.fieldEditor="gridpicker"
+    //% servo.fieldOptions.width=220
+    //% servo.fieldOptions.columns=2
+    //% group="servo"
+    export function Servos_SetPulse(servo: Servo_port, micros: number) {
+        switch (servo) {
+            case 0:
+                servos.P0.setPulse(micros)
+                break;
+            case 1:
+                servos.P1.setPulse(micros)
+                break;
+            case 2:
+                servos.P2.setPulse(micros)
+                break;
+            default:
+                break;
+        }
+    }
 
-    // //% blockId=Serial_Available
-    // //% block="port %x serial read available"
-    // //% group="serial"
-    // export function Serial_Available(x: PortNo): boolean {
-    //     return cx_serial[x].available();
-    // }
+    /**
+     * Stop sending commands to the servo so that its rotation will stop at the current position.
+     */
+    // On a normal servo this will stop the servo where it is, rather than return it to neutral position.
+    // It will also not provide any holding force.
+    //% weight=10 help=servos/stop
+    //% blockId=Servos_Stop block="stop %servo"
+    //% servo.fieldEditor="gridpicker"
+    //% servo.fieldOptions.width=220
+    //% servo.fieldOptions.columns=2
+    //% group="servo"
+    export function Servos_Stop(servo: Servo_port) {
+        switch (servo) {
+            case 0:
+                servos.P0.stop()
+                break;
+            case 1:
+                servos.P1.stop()
+                break;
+            case 2:
+                servos.P2.stop()
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Set the possible rotation range angles for the servo between 0 and 180
+     * @param minAngle the minimum angle from 0 to 90
+     * @param maxAngle the maximum angle from 90 to 180
+     */
+    //% help=servos/set-range
+    //% blockId=Servos_SetRange block="set %servo range from %minAngle to %maxAngle"
+    //% minAngle.min=0 minAngle.max=90
+    //% maxAngle.min=90 maxAngle.max=180 maxAngle.defl=180
+    //% servo.fieldEditor="gridpicker"
+    //% servo.fieldOptions.width=220
+    //% servo.fieldOptions.columns=2
+    //% group="servo"
+    export function Servos_SetRange(servo: Servo_port, minAngle: number, maxAngle: number) {
+        switch (servo) {
+            case 0:
+                servos.P0.setRange(minAngle, maxAngle)
+                break;
+            case 1:
+                servos.P1.setRange(minAngle, maxAngle)
+                break;
+            case 2:
+                servos.P2.setRange(minAngle, maxAngle)
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Set a servo stop mode so it will stop when the rotation angle is in the neutral position, 90 degrees.
+     * @param on true to enable this mode
+     */
+    //% help=servos/set-stop-on-neutral
+    //% blockId=Servos_SetStopOnNeutral block="set %servo stop on neutral %enabled"
+    //% enabled.shadow=toggleOnOff
+    //% group="servo"
+    //% servo.fieldEditor="gridpicker"
+    //% servo.fieldOptions.width=220
+    //% servo.fieldOptions.columns=2
+    export function Servos_SetStopOnNeutral(servo: Servo_port, enabled: boolean) {
+        switch (servo) {
+            case 0:
+                servos.P0.setStopOnNeutral(enabled)
+                break;
+            case 1:
+                servos.P1.setStopOnNeutral(enabled)
+                break;
+            case 2:
+                servos.P2.setStopOnNeutral(enabled)
+                break;
+            default:
+                break;
+        }
+    }
 }
