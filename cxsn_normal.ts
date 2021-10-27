@@ -13,6 +13,15 @@ enum PortNo {
     port6 = 5
 }
 
+enum AnalogInputPortNo {
+    //% block="port1"
+    port1 = 0,
+    //% block="port2"
+    port2 = 1,
+    //% block="port3"
+    port3 = 2
+}
+
 enum MotorNo {
     //% block="motor_1"
     motor_1 = 0,
@@ -30,12 +39,12 @@ enum MotorDir {
 enum Serial_mode {
     //% block="readwrite"
     _readwrite = 3,
-    //% block="unused"
-    _unused = 0,
-    //% block="readonly"
-    _read = 1,
     //% block="writeonly"
     _write = 2,
+    //% block="readonly"
+    _read = 1,
+    //% block="unused"
+    _unused = 0,
 }
 
 
@@ -50,10 +59,16 @@ namespace CXSN_normal {
         [DigitalPin.P9, DigitalPin.P10, DigitalPin.P11],
         [DigitalPin.P13, DigitalPin.P14, DigitalPin.P15],
         [DigitalPin.P16, DigitalPin.P19, DigitalPin.P20]];
+    const analog_pin = [
+        [AnalogPin.P0, AnalogPin.P3, AnalogPin.P4],
+        [AnalogPin.P1, AnalogPin.P5, AnalogPin.P6],
+        [AnalogPin.P2, AnalogPin.P8, AnalogPin.P7],
+        [AnalogPin.P9, AnalogPin.P10, AnalogPin.P11],
+        [AnalogPin.P13, AnalogPin.P14, AnalogPin.P15],
+        [AnalogPin.P16, AnalogPin.P19, AnalogPin.P20]];
 
-
-    let cx_serial: cxsn_serial[] = [new cxsn_serial(), new cxsn_serial(), new cxsn_serial(), 
-    new cxsn_serial(), new cxsn_serial(), new cxsn_serial()];
+    // let cx_serial: cxsn_serial[] = [new cxsn_serial(), new cxsn_serial(), new cxsn_serial(), 
+    // new cxsn_serial(), new cxsn_serial(), new cxsn_serial()];
 
     //% blockId=Set_LED
     //% block="set port %x LED %state"
@@ -66,74 +81,98 @@ namespace CXSN_normal {
             pins.digitalWritePin(pin_id[x][0], 1)
     }
 
+    /*LEDpwm*/
+
+    //% blockId=Read_Key
+    //% block="%x key state"
+    //% group="normal"
+    export function Read_Key(x: PortNo): boolean{
+        if (pins.digitalReadPin(pin_id[x][0]) == 0)
+            return true
+        else
+            return false
+    }
+
+    //% blockId=RP_Read_Number
+    //% block="the number of %x RP"
+    //% group="normal"
+    export function RP_Read_Number(x: AnalogInputPortNo): number {
+        return pins.analogReadPin(analog_pin[x][0])
+    }
+
+    //% blockId=RP_Read_Voltage
+    //% block="the voltage of %x"
+    //% group="normal"
+    export function RP_Read_Voltage(x: AnalogInputPortNo): number {
+        return pins.analogReadPin(analog_pin[x][0]) * 5 / 1023
+    }
+
     //% blockId=Motor_Init
-    //% block="Init the motor as %x"
+    //% block="Init the motor as %serial"
     //% group="motor"
-    export function Motor_Init(x: PortNo) {
-        cx_serial[x].init(pin_id[x][0], pin_id[x][2], 9600, Serial_mode._write);
-        cx_serial[x].begin();
+    export function Motor_Init(serial: cxsn_serial) {
+        serial.init(Serial_mode._write)
     }
 
     //% blockId=Set_motor
-    //% block="set %x the %no %dir rotation, speed is %speed"
+    //% block="set %serial the %no %dir rotation, speed is %speed"
     //% inlineInputMode = inline
     //% speed.max=100 speed.min=0 speed.defl=100
     //% group="motor"
-
-    export function Set_motor(x: PortNo, no: MotorNo, dir: MotorDir, speed: number) {
+    export function Set_motor(serial: cxsn_serial, no: MotorNo, dir: MotorDir, speed: number) {
         if (no == MotorNo.motor_1) {
-            cx_serial[x].write_numbers([0x5A, 0xA0, dir, speed]);
+            serial.write_numbers([0x5A, 0xA0, dir, speed]);
         } else if (no == MotorNo.motor_2) {
-            cx_serial[x].write_numbers([0x5A, 0xA5, dir, speed]);
+            serial.write_numbers([0x5A, 0xA5, dir, speed]);
         }
     }
 
-    //% blockId=InitSerial
-    //% block="set port %x as serial with %mode mode"
-    //% group="serial"
-    export function InitSerial(x: PortNo, mode: Serial_mode) {
-        if (cx_serial[x] == null) {
-            cx_serial[x] = new cxsn_serial();
-        }
-        cx_serial[x].init(pin_id[x][0], pin_id[x][2], 9600, mode);
-        cx_serial[x].begin();
-    }
+    // //% blockId=InitSerial
+    // //% block="set port %x as serial with %mode mode"
+    // //% group="serial"
+    // export function InitSerial(x: PortNo, mode: Serial_mode) {
+    //     if (cx_serial[x] == null) {
+    //         cx_serial[x] = new cxsn_serial();
+    //     }
+    //     cx_serial[x].init(pin_id[x][0], pin_id[x][2], 9600, mode);
+    //     cx_serial[x].begin();
+    // }
 
-    //% blockId=InitSerial_Ex
-    //% block="set port %x as serial | mode:%mode | tx pin:%tx_p | rx pin:%rx_p"
-    //% tx_p.min=0 tx_p.max=2 tx_p.defl=0
-    //% rx_p.min=0 rx_p.max=2 rx_p.defl=2
-    //% group="serial"
-    export function InitSerial_Ex(x: PortNo, mode: Serial_mode, tx_p: number, rx_p: number) {
-        cx_serial[x].init(pin_id[x][tx_p], pin_id[x][rx_p], 9600, mode);
-        cx_serial[x].begin()
-    }
+    // //% blockId=InitSerial_Ex
+    // //% block="set port %x as serial | mode:%mode | tx pin:%tx_p | rx pin:%rx_p"
+    // //% tx_p.min=0 tx_p.max=2 tx_p.defl=0
+    // //% rx_p.min=0 rx_p.max=2 rx_p.defl=2
+    // //% group="serial"
+    // export function InitSerial_Ex(x: PortNo, mode: Serial_mode, tx_p: number, rx_p: number) {
+    //     cx_serial[x].init(pin_id[x][tx_p], pin_id[x][rx_p], 9600, mode);
+    //     cx_serial[x].begin()
+    // }
 
-    //% blockId=Serial_Write_String
-    //% block="port %x serial write %str"
-    //% group="serial"
-    export function Serial_Write_String(x: PortNo, str: string) {
-        cx_serial[x].write_string(str);
-    }
+    // //% blockId=Serial_Write_String
+    // //% block="port %x serial write %str"
+    // //% group="serial"
+    // export function Serial_Write_String(x: PortNo, str: string) {
+    //     cx_serial[x].write_string(str);
+    // }
 
-    //% blockId=Serial_Write_Number
-    //% block="port %x serial write %arr"
-    //% group="serial"
-    export function Serial_Write_Number(x: PortNo, arr: number[]) {
-        cx_serial[x].write_numbers(arr);
-    }
+    // //% blockId=Serial_Write_Number
+    // //% block="port %x serial write %arr"
+    // //% group="serial"
+    // export function Serial_Write_Number(x: PortNo, arr: number[]) {
+    //     cx_serial[x].write_numbers(arr);
+    // }
 
-    //% blockId=Serial_Read
-    //% block="port %x serial read"
-    //% group="serial"
-    export function Serial_Read(x: PortNo): string {
-        return cx_serial[x].read();
-    }
+    // //% blockId=Serial_Read
+    // //% block="port %x serial read"
+    // //% group="serial"
+    // export function Serial_Read(x: PortNo): string {
+    //     return cx_serial[x].read();
+    // }
 
-    //% blockId=Serial_Available
-    //% block="port %x serial read available"
-    //% group="serial"
-    export function Serial_Available(x: PortNo): boolean {
-        return cx_serial[x].available();
-    }
+    // //% blockId=Serial_Available
+    // //% block="port %x serial read available"
+    // //% group="serial"
+    // export function Serial_Available(x: PortNo): boolean {
+    //     return cx_serial[x].available();
+    // }
 }

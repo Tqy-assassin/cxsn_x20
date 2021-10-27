@@ -3,7 +3,9 @@
     "version": "0.2.0",
     "description": "",
     "dependencies": {
-        "core": "*"
+        "core": "*",
+        "servo": "*",
+        "bluetooth": "*"
     },
     "files": [
         "README.md",
@@ -17,7 +19,7 @@
     ],
     "public": true,
     "targetVersions": {
-        "target": "4.0.11",
+        "target": "4.0.16",
         "targetId": "microbit"
     },
     "supportedTargets": [
