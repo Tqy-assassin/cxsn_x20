@@ -22,12 +22,13 @@ namespace CXSN_normal{
         private _rx_pin: DigitalPin;
         private _tx_pin: DigitalPin;
         private _delay: number = 0;
-        private _recvDate: Array<number>;
+        private _recvBuf: Array<number>;
+
         
         constructor(tx_pin: DigitalPin, rx_pin: DigitalPin) {
             this._mode = Serial_mode._unused
             this._delay = 0
-            this._recvDate = []
+            this._recvBuf = []
             this._rx_pin = rx_pin
             this._tx_pin = tx_pin
         }
@@ -69,24 +70,26 @@ namespace CXSN_normal{
 
         private reading() {
             while (this._mode == Serial_mode._read || this._mode == Serial_mode._readwrite) {
-                if (pins.digitalReadPin(this._rx_pin)) {
-                    let recvBuf: number = 0;
+                if (pins.digitalReadPin(this._rx_pin) == 0) {
+                    let recvDate: number = 0;
                     let i = 0;
                     control.waitMicros(this._delay - 30);
                     for (; i < 8; i++) {
-                        if (pins.digitalReadPin(this._rx_pin)) {
-                            recvBuf |= (1 << i)
+                        if (pins.digitalReadPin(this._rx_pin) == 1) {
+                            recvDate |= (1 << i)
                         } else {
-                            recvBuf &= ~(1 << i)
+                            recvDate &= ~(1 << i)
                         }
                         control.waitMicros(this._delay);
                     }
-                    this._recvDate.push(recvBuf);
+                    this._recvBuf.push(recvDate);
+                } else {
+                    control.waitMicros(100);
                 }
             }
         }
 
-        private writing(transDate: number) {
+        private writing(transDate:number) {
             if (this._mode == Serial_mode._write || this._mode == Serial_mode._readwrite) {
                 let i = 0;
                 // let timer : number;
@@ -94,7 +97,7 @@ namespace CXSN_normal{
                 pins.digitalWritePin(this._tx_pin, 0);
                 control.waitMicros(this._delay - 30);
                 for (; i <= 7; i++) {
-                    if ((transDate & (1<<i)) == 0) {
+                    if ((transDate & (1 << i)) == 0) {
                         pins.digitalWritePin(this._tx_pin, 0);
                     } else {
                         pins.digitalWritePin(this._tx_pin, 1);
@@ -131,7 +134,7 @@ namespace CXSN_normal{
         read(): string {
             let ret = "";
             while (this.available()) {
-                let res = this._recvDate.shift();
+                let res = this._recvBuf.shift();
                 ret += String.fromCharCode(res);
             }
             return ret;
@@ -142,7 +145,7 @@ namespace CXSN_normal{
         //% block="%serial read available"
         //% group="serial"
         available(): boolean {
-            return this._recvDate.length > 0;
+            return this._recvBuf.length > 0;
         }
     }
 

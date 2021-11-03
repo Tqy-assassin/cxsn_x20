@@ -129,6 +129,7 @@ namespace CXSN_normal {
 
     /**
      * Set the servo angle
+     * @param degrees the angle of the servo
      */
     //% weight=100 help=servos/set-angle
     //% blockId=Servos_SetAngle block="set %servo angle to %degrees=protractorPicker °"
@@ -267,7 +268,7 @@ namespace CXSN_normal {
 
     /**
      * Set a servo stop mode so it will stop when the rotation angle is in the neutral position, 90 degrees.
-     * @param on true to enable this mode
+     * @param enabled on true to enable this mode
      */
     //% help=servos/set-stop-on-neutral
     //% blockId=Servos_SetStopOnNeutral block="set %servo stop on neutral %enabled"
