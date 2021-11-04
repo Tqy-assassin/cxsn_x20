@@ -1,164 +1,82 @@
+enum SerialTxPort{
+    //% block="port2"
+    Port2 = 1,
+    //% block="port4"
+    Port4 = 3,
+    //% block="port6"
+    Port6 = 5,
+}
+enum SerialRxPort {
+    //% block="port2"
+    Port2 = 1,
+    //% block="port4"
+    Port4 = 3,
+    //% block="port5"
+    Port5 = 4,
+}
+enum SerialPort {
+    //% block="port2"
+    Port2 = 1,
+    //% block="port4"
+    Port4 = 3,
+    //% block="port5"
+    Port5 = 4,
+    //% block="port6"
+    Port6 = 5,
+}
+
 
 namespace CXSN_normal{
-    const pin_id = [
-        [DigitalPin.P0, DigitalPin.P3, DigitalPin.P4],
-        [DigitalPin.P1, DigitalPin.P5, DigitalPin.P6],
-        [DigitalPin.P2, DigitalPin.P8, DigitalPin.P7],
-        [DigitalPin.P9, DigitalPin.P10, DigitalPin.P11],
-        [DigitalPin.P13, DigitalPin.P14, DigitalPin.P15],
-        [DigitalPin.P16, DigitalPin.P19, DigitalPin.P20]];
-    const analog_pin = [
-        [AnalogPin.P0, AnalogPin.P3, AnalogPin.P4],
-        [AnalogPin.P1, AnalogPin.P5, AnalogPin.P6],
-        [AnalogPin.P2, AnalogPin.P8, AnalogPin.P7],
-        [AnalogPin.P9, AnalogPin.P10, AnalogPin.P11],
-        [AnalogPin.P13, AnalogPin.P14, AnalogPin.P15],
-        [AnalogPin.P16, AnalogPin.P19, AnalogPin.P20]];
+    const Serial_pin_id = [
+        [0, 0, 0],
+        [SerialPin.P0, 0, SerialPin.P8],
+        [0, 0, 0],
+        [SerialPin.P1, SerialPin.P13, SerialPin.P14],
+        [0, SerialPin.P15, SerialPin.P16],
+        [SerialPin.P2, 0, 0]];
 
-    //% fixedInstances
-    //% block="serial"
-    export class cxsn_serial {
-        private _mode: Serial_mode = Serial_mode._unused;
-        private _rx_pin: DigitalPin;
-        private _tx_pin: DigitalPin;
-        private _delay: number = 0;
-        private _recvBuf: Array<number>;
+    let serial_tx_p = SerialPin.USB_TX
+    let serial_rx_p = SerialPin.USB_RX
 
-        
-        constructor(tx_pin: DigitalPin, rx_pin: DigitalPin) {
-            this._mode = Serial_mode._unused
-            this._delay = 0
-            this._recvBuf = []
-            this._rx_pin = rx_pin
-            this._tx_pin = tx_pin
+    //% blockId=serial_init
+    //% block="serial set | tx port:%tx_port tx pin:%tx_p | rx port:%rx_port  rx pin:%rx_p | baud:%number | mode:%mode"
+    //% tx_p.min=0 tx_p.max=2 tx_p.defl=0
+    //% rx_p.min=0 rx_p.max=2 rx_p.defl=2
+    //% baud.defl=9600
+    //% group="serial" advanced=true
+    export function serial_init(tx_port: SerialPort, tx_p: number, rx_port: SerialPort, rx_p: number, baud: number, mode: Serial_mode) {
+        if (mode == Serial_mode._write || mode == Serial_mode._readwrite){
+            if (Serial_pin_id[tx_port][tx_p] != 0){
+                serial_tx_p = Serial_pin_id[tx_port][tx_p];
+            } else {
+                serial_tx_p = SerialPin.USB_TX;
+            }
         }
-
-        //% blockId=InitSerial
-        //% block="%serial set mode:%mode"
-        //% group="serial" advanced=true
-        public init(mode: Serial_mode) {
-            this._mode = mode;
-            this._delay = 1000000 / 9600 - 12;
-            this.begin()
-        }
-
-
-        //% blockId=InitSerial_Ex
-        //% block="%serial set | tx pin:%tx_p | rx pin:%rx_p | baud:%number | mode:%mode"
-        //% tx_p.min=0 tx_p.max=2 tx_p.defl=0
-        //% rx_p.min=0 rx_p.max=2 rx_p.defl=2
-        //% baud.defl=9600
-        //% group="serial" advanced=true
-        init_Ex(tx_p: DigitalPin, rx_p: DigitalPin, baud: number, mode: Serial_mode) {
-            this._rx_pin = rx_p;
-            this._tx_pin = tx_p;
-            this._mode = mode;
-            this._delay = 1000000 / baud - 12;
-            this.begin()
-        }
-
-        public begin() {
-            if (this._mode == Serial_mode._write || this._mode == Serial_mode._readwrite) {
-                pins.digitalWritePin(this._tx_pin, 1)
+        if (mode == Serial_mode._read || mode == Serial_mode._readwrite) {
+            if (Serial_pin_id[rx_port][rx_p] != 0) {
+                serial_rx_p = Serial_pin_id[rx_port][rx_p];
             }else{
-                pins.digitalWritePin(this._tx_pin, 0)
-            }
-            if (this._mode == Serial_mode._read || this._mode == Serial_mode._readwrite) {
-                control.inBackground(() => this.reading())
+                serial_rx_p = SerialPin.USB_RX;
             }
         }
-
-        private reading() {
-            while (this._mode == Serial_mode._read || this._mode == Serial_mode._readwrite) {
-                if (pins.digitalReadPin(this._rx_pin) == 0) {
-                    let recvDate: number = 0;
-                    let i = 0;
-                    control.waitMicros(this._delay - 30);
-                    for (; i < 8; i++) {
-                        if (pins.digitalReadPin(this._rx_pin) == 1) {
-                            recvDate |= (1 << i)
-                        } else {
-                            recvDate &= ~(1 << i)
-                        }
-                        control.waitMicros(this._delay);
-                    }
-                    this._recvBuf.push(recvDate);
-                } else {
-                    control.waitMicros(100);
-                }
-            }
-        }
-
-        private writing(transDate:number) {
-            if (this._mode == Serial_mode._write || this._mode == Serial_mode._readwrite) {
-                let i = 0;
-                // let timer : number;
-                // timer = control.micros();
-                pins.digitalWritePin(this._tx_pin, 0);
-                control.waitMicros(this._delay - 30);
-                for (; i <= 7; i++) {
-                    if ((transDate & (1 << i)) == 0) {
-                        pins.digitalWritePin(this._tx_pin, 0);
-                    } else {
-                        pins.digitalWritePin(this._tx_pin, 1);
-                    }
-                    control.waitMicros(this._delay);
-                }
-                pins.digitalWritePin(this._tx_pin, 1);
-                control.waitMicros(this._delay * 2);
-            }
-        }
-
-        //% blockId=Serial_Write_String
-        //% block="%serial serial write %msg"
-        //% group="serial" advanced=true
-        write_string(msg: string) {
-            for (let i = 0; i < msg.length; i++) {
-                this.writing(msg[i].charCodeAt(0))
-            }
-        }
-
-        //% blockId=Serial_Write_Number
-        //% block="%serial write %arr"
-        //% group="serial" advanced=true
-        write_numbers(arr: number[]) {
-            for (let i = 0; i < arr.length; i++) {
-                this.writing(arr[i])
-            }
-        }
-
-
-        //% blockId=Serial_Read
-        //% block="%serial read"
-        //% group="serial" advanced=true
-        read(): string {
-            let ret = "";
-            while (this.available()) {
-                let res = this._recvBuf.shift();
-                ret += String.fromCharCode(res);
-            }
-            return ret;
-        }
-
-
-        //% blockId=Serial_Available
-        //% block="%serial read available"
-        //% group="serial" advanced=true
-        available(): boolean {
-            return this._recvBuf.length > 0;
-        }
+        serial.redirect(serial_tx_p, serial_rx_p, baud);
     }
 
-    //% block="serial Port1" fixedInstance whenUsed
-    export const Port1 = new cxsn_serial(pin_id[0][0], pin_id[0][2]);
-    //% block="serial Port2" fixedInstance whenUsed
-    export const Port2 = new cxsn_serial(pin_id[1][0], pin_id[1][2]);
-    //% block="serial Port3" fixedInstance whenUsed
-    export const Port3 = new cxsn_serial(pin_id[2][0], pin_id[2][2]);
-    //% block="serial Port4" fixedInstance whenUsed
-    export const Port4 = new cxsn_serial(pin_id[3][0], pin_id[3][2]);
-    //% block="serial Port5" fixedInstance whenUsed
-    export const Port5 = new cxsn_serial(pin_id[4][0], pin_id[4][2]);
-    //% block="serial Port6" fixedInstance whenUsed
-    export const Port6 = new cxsn_serial(pin_id[5][0], pin_id[5][2]);
+    export function tx_serial_init(tx_port: SerialTxPort, tx_p: DigitalPin, baud: number) {
+        if (Serial_pin_id[tx_port][tx_p] != 0) {
+            serial_tx_p = Serial_pin_id[tx_port][tx_p];
+        } else {
+            serial_tx_p = SerialPin.USB_TX;
+        }
+        serial.redirect(serial_tx_p, serial_rx_p, baud);
+    }
+
+    export function rx_serial_init(rx_port: SerialRxPort, rx_p: DigitalPin, baud: number) {
+        if (Serial_pin_id[rx_port][rx_p] != 0) {
+            serial_rx_p = Serial_pin_id[rx_port][rx_p];
+        } else {
+            serial_rx_p = SerialPin.USB_RX;
+        }
+        serial.redirect(serial_tx_p, serial_rx_p, baud);
+    }
 }

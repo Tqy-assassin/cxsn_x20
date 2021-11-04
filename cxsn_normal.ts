@@ -1,15 +1,15 @@
 enum PortNo {
-    //% block="port1"
+    //% block="port1" blockId="port1"
     port1 = 0,
-    //% block="port2"
+    //% block="port2" blockId="port2"
     port2 = 1,
-    //% block="port3"
+    //% block="port3" blockId="port3"
     port3 = 2,
-    //% block="port4"
+    //% block="port4" blockId="port4"
     port4 = 3,
-    //% block="port5"
+    //% block="port5" blockId="port5"
     port5 = 4,
-    //% block="port6"
+    //% block="port6" blockId="port6"
     port6 = 5
 }
 
@@ -39,11 +39,11 @@ enum Serial_mode {
 }
 
 enum Servo_port {
-    //% block="port1"
+    //% block="port1" blockId="port1"
     port1 = 0,
-    //% block="port2"
+    //% block="port2" blockId="port2"
     port2 = 1,
-    //% block="port3"
+    //% block="port3" blockId="port3"
     port3 = 2,
 }
 
@@ -52,19 +52,19 @@ enum Servo_port {
 //% group 
 namespace CXSN_normal {
     const pin_id = [
-        [DigitalPin.P0, DigitalPin.P3, DigitalPin.P4],
-        [DigitalPin.P1, DigitalPin.P5, DigitalPin.P6],
-        [DigitalPin.P2, DigitalPin.P8, DigitalPin.P7],
-        [DigitalPin.P9, DigitalPin.P10, DigitalPin.P11],
-        [DigitalPin.P13, DigitalPin.P14, DigitalPin.P15],
-        [DigitalPin.P16, DigitalPin.P19, DigitalPin.P20]];
+        [DigitalPin.P3, DigitalPin.P5, DigitalPin.P6],
+        [DigitalPin.P0, DigitalPin.P7, DigitalPin.P8],
+        [DigitalPin.P4, DigitalPin.P9, DigitalPin.P11],
+        [DigitalPin.P1, DigitalPin.P13, DigitalPin.P14],
+        [DigitalPin.P10, DigitalPin.P15, DigitalPin.P16],
+        [DigitalPin.P2, DigitalPin.P19, DigitalPin.P20]];
     const analog_pin = [
-        [AnalogPin.P0, AnalogPin.P3, AnalogPin.P4],
-        [AnalogPin.P1, AnalogPin.P5, AnalogPin.P6],
-        [AnalogPin.P2, AnalogPin.P8, AnalogPin.P7],
-        [AnalogPin.P9, AnalogPin.P10, AnalogPin.P11],
-        [AnalogPin.P13, AnalogPin.P14, AnalogPin.P15],
-        [AnalogPin.P16, AnalogPin.P19, AnalogPin.P20]];
+        [AnalogPin.P3, AnalogPin.P5, AnalogPin.P6],
+        [AnalogPin.P0, AnalogPin.P7, AnalogPin.P8],
+        [AnalogPin.P4, AnalogPin.P9, AnalogPin.P11],
+        [AnalogPin.P1, AnalogPin.P13, AnalogPin.P14],
+        [AnalogPin.P10, AnalogPin.P15, AnalogPin.P16],
+        [AnalogPin.P2, AnalogPin.P19, AnalogPin.P20]];
 
     // let cx_serial: cxsn_serial[] = [new cxsn_serial(), new cxsn_serial(), new cxsn_serial(), 
     // new cxsn_serial(), new cxsn_serial(), new cxsn_serial()];
@@ -109,20 +109,20 @@ namespace CXSN_normal {
     //% blockId=Motor_Init
     //% block="Init the motor as %serial"
     //% group="motor"
-    export function Motor_Init(serial: cxsn_serial) {
-        serial.init(Serial_mode._write)
+    export function Motor_Init(serial: SerialTxPort) {
+        tx_serial_init(serial, 0, 9600);
     }
 
     //% blockId=Set_motor
-    //% block="set %serial the %no %dir rotation, speed is %speed"
+    //% block="set motor the %no %dir rotation, speed is %speed"
     //% inlineInputMode = inline
     //% speed.max=100 speed.min=0 speed.defl=100
     //% group="motor"
-    export function Set_motor(serial: cxsn_serial, no: MotorNo, dir: MotorDir, speed: number) {
+    export function Set_motor(no: MotorNo, dir: MotorDir, speed: number) {
         if (no == MotorNo.motor_1) {
-            serial.write_numbers([0x5A, 0xA0, dir, speed]);
+            serial.writeNumbers([0x5A, 0xA0, dir, speed]);
         } else if (no == MotorNo.motor_2) {
-            serial.write_numbers([0x5A, 0xA5, dir, speed]);
+            serial.writeNumbers([0x5A, 0xA5, dir, speed]);
         }
     }
 
