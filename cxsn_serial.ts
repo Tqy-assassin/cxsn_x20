@@ -35,7 +35,7 @@ namespace CXSN_normal{
 
         //% blockId=InitSerial
         //% block="%serial set mode:%mode"
-        //% group="serial"
+        //% group="serial" advanced=true
         public init(mode: Serial_mode) {
             this._mode = mode;
             this._delay = 1000000 / 9600 - 12;
@@ -48,7 +48,7 @@ namespace CXSN_normal{
         //% tx_p.min=0 tx_p.max=2 tx_p.defl=0
         //% rx_p.min=0 rx_p.max=2 rx_p.defl=2
         //% baud.defl=9600
-        //% group="serial"
+        //% group="serial" advanced=true
         init_Ex(tx_p: DigitalPin, rx_p: DigitalPin, baud: number, mode: Serial_mode) {
             this._rx_pin = rx_p;
             this._tx_pin = tx_p;
@@ -111,7 +111,7 @@ namespace CXSN_normal{
 
         //% blockId=Serial_Write_String
         //% block="%serial serial write %msg"
-        //% group="serial"
+        //% group="serial" advanced=true
         write_string(msg: string) {
             for (let i = 0; i < msg.length; i++) {
                 this.writing(msg[i].charCodeAt(0))
@@ -120,7 +120,7 @@ namespace CXSN_normal{
 
         //% blockId=Serial_Write_Number
         //% block="%serial write %arr"
-        //% group="serial"
+        //% group="serial" advanced=true
         write_numbers(arr: number[]) {
             for (let i = 0; i < arr.length; i++) {
                 this.writing(arr[i])
@@ -130,7 +130,7 @@ namespace CXSN_normal{
 
         //% blockId=Serial_Read
         //% block="%serial read"
-        //% group="serial"
+        //% group="serial" advanced=true
         read(): string {
             let ret = "";
             while (this.available()) {
@@ -143,7 +143,7 @@ namespace CXSN_normal{
 
         //% blockId=Serial_Available
         //% block="%serial read available"
-        //% group="serial"
+        //% group="serial" advanced=true
         available(): boolean {
             return this._recvBuf.length > 0;
         }

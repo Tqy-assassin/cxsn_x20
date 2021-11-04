@@ -45,5 +45,6 @@
     "{id:category}CXSN_normal": "晨旭少年基础模块",
     "{id:group}motor": "电机模块",
     "{id:group}normal": "常用传感器",
-    "{id:group}serial": "软串口"
+    "{id:group}serial": "软串口",
+    "{id:group}servo": "舵机模块"
 }
